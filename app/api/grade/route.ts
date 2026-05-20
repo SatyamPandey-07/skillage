@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { anthropic, MODEL } from "@/src/lib/claude";
+import { generateText } from "@/src/lib/claude";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,10 +16,8 @@ export async function POST(request: NextRequest) {
       )
       .join("\n\n");
 
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1200,
-      system: `You are a strict but fair quiz grader for a learning platform.
+    const raw = await generateText(
+      `You are a strict but fair quiz grader for a learning platform.
 Return ONLY valid JSON. No markdown, no preamble.
 Schema:
 {
@@ -43,19 +41,11 @@ Scoring rubric per question (max 20 pts):
 - 5: Vague or tangential but not entirely wrong
 - 0: Wrong, off-topic, or blank
 Award partial credit generously for partially correct answers.`,
-      messages: [
-        {
-          role: "user",
-          content: `Topic: ${topic}\nDifficulty: ${difficulty}\nLesson: ${lessonSummary}\n\n${qaBlock}`,
-        },
-      ],
-    });
+      `Topic: ${topic}\nDifficulty: ${difficulty}\nLesson: ${lessonSummary}\n\n${qaBlock}`
+    );
 
-    const raw = (response.content[0] as { text: string }).text
-      .replace(/```json|```/g, "")
-      .trim();
-
-    return Response.json(JSON.parse(raw));
+    const json = raw.replace(/```json|```/g, "").trim();
+    return Response.json(JSON.parse(json));
   } catch (err) {
     console.error("[/api/grade]", err);
     return Response.json({ error: "AI service temporarily unavailable." }, { status: 500 });

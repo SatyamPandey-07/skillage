@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { anthropic, MODEL } from "@/src/lib/claude";
+import { generateText } from "@/src/lib/claude";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,10 +9,8 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "Topic is required" }, { status: 400 });
     }
 
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 800,
-      system: `You are an educator generating quiz questions.
+    const raw = await generateText(
+      `You are an educator generating quiz questions.
 Return ONLY a valid JSON array of 5 question objects. No markdown, no preamble.
 Schema:
 [
@@ -24,14 +22,11 @@ Schema:
 ]
 Generate 5 DIFFERENT questions from a typical previous set on this topic.
 Focus on aspects of the topic not covered by the most obvious questions.`,
-      messages: [{ role: "user", content: `Topic: ${topic}\nDifficulty: ${difficulty}` }],
-    });
+      `Topic: ${topic}\nDifficulty: ${difficulty}`
+    );
 
-    const raw = (response.content[0] as { text: string }).text
-      .replace(/```json|```/g, "")
-      .trim();
-
-    return Response.json(JSON.parse(raw));
+    const json = raw.replace(/```json|```/g, "").trim();
+    return Response.json(JSON.parse(json));
   } catch (err) {
     console.error("[/api/retry]", err);
     return Response.json({ error: "AI service temporarily unavailable." }, { status: 500 });

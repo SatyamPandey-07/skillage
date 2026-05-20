@@ -1,8 +1,17 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Server-only — never import in client components
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
-export const MODEL = "claude-sonnet-4-20250514";
+export const MODEL = "gemini-2.5-flash";
+
+export async function generateText(
+  systemPrompt: string,
+  userMessage: string
+): Promise<string> {
+  const model = genAI.getGenerativeModel({
+    model: MODEL,
+    systemInstruction: systemPrompt,
+  });
+  const result = await model.generateContent(userMessage);
+  return result.response.text();
+}

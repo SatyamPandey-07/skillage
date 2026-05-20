@@ -1,8 +1,11 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config({ path: "../.env.local" });
+require("dotenv").config({ path: require("path").join(__dirname, "../.env.local") });
 
 module.exports = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.28",
+    settings: { evmVersion: "cancun" },
+  },
   networks: {
     base_sepolia: {
       url: "https://sepolia.base.org",

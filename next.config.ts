@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["mongoose", "@anthropic-ai/sdk", "ethers", "siwe"],
+  serverExternalPackages: ["mongoose", "@google/generative-ai", "ethers", "siwe"],
   turbopack: {
     resolveAlias: {
       "@solana/web3.js": "./src/stubs/empty.js",

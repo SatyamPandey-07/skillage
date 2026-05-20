@@ -128,6 +128,9 @@ export default function Home() {
         )}
 
         <div className="flex items-center gap-3">
+          <Link href="/course" className="text-xs text-white/40 hover:text-white/70 transition-colors">
+            Courses
+          </Link>
           <Link href="/dashboard" className="text-xs text-white/40 hover:text-white/70 transition-colors">
             Dashboard
           </Link>
@@ -206,7 +209,7 @@ export default function Home() {
                     role="status"
                     aria-label="Grading answers"
                   />
-                  <p className="text-sm text-white/50">Claude is reviewing your answers…</p>
+                  <p className="text-sm text-white/50">Wait while we are reviewing your answers…</p>
                   <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 </div>
               )}
