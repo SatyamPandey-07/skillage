@@ -65,8 +65,10 @@ interface SubmoduleViewerProps {
   submodule: SubmoduleOutline;
   content: SubmoduleContent | undefined;
   loading: boolean;
+  error?: string;
   completed: boolean;
   onComplete: () => void;
+  onRetry?: () => void;
 }
 
 export function SubmoduleViewer({
@@ -74,8 +76,10 @@ export function SubmoduleViewer({
   submodule,
   content,
   loading,
+  error,
   completed,
   onComplete,
+  onRetry,
 }: SubmoduleViewerProps) {
   if (loading) {
     return (
@@ -92,7 +96,28 @@ export function SubmoduleViewer({
     );
   }
 
+  if (error) {
+    return (
+      <div className="se-card p-6 text-center space-y-3" style={{ borderColor: "rgba(239,68,68,0.2)" }}>
+        <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>Failed to load submodule content.</p>
+        <p className="text-xs" style={{ color: "rgba(239,68,68,0.6)" }}>{error}</p>
+        {onRetry && (
+          <button
+            onClick={onRetry}
+            className="px-4 py-2 rounded-[8px] text-sm font-semibold text-white transition-all"
+            style={{ background: "rgb(99,102,241)" }}
+          >
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
+
   if (!content) return null;
+
+  // Guard against malformed API response
+  if (typeof content.content !== "string") return null;
 
   const paragraphs = content.content.split("\n\n").filter(Boolean);
 

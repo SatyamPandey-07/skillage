@@ -9,6 +9,7 @@ export function useCourse() {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<Record<string, boolean>>({});
   const [submoduleContents, setSubmoduleContents] = useState<Record<string, SubmoduleContent>>({});
+  const [submoduleErrors, setSubmoduleErrors] = useState<Record<string, string>>({});
   const [loadingSubmodule, setLoadingSubmodule] = useState<string | null>(null);
 
   const courseRef = useRef<CourseData | null>(null);
@@ -21,6 +22,7 @@ export function useCourse() {
     setCourse(null);
     setProgress({});
     setSubmoduleContents({});
+    setSubmoduleErrors({});
     courseRef.current = null;
     inflight.current.clear();
     loaded.current.clear();
@@ -67,17 +69,30 @@ export function useCourse() {
     })
       .then((r) => r.json())
       .then((data) => {
-        loaded.current.add(submoduleId);
-        setSubmoduleContents((prev) => ({ ...prev, [submoduleId]: data }));
+        if (data.error) {
+          setSubmoduleErrors((prev) => ({ ...prev, [submoduleId]: data.error }));
+        } else {
+          loaded.current.add(submoduleId);
+          setSubmoduleContents((prev) => ({ ...prev, [submoduleId]: data }));
+          setSubmoduleErrors((prev) => { const next = { ...prev }; delete next[submoduleId]; return next; });
+        }
         setLoadingSubmodule((cur) => (cur === submoduleId ? null : cur));
       })
       .catch(() => {
+        setSubmoduleErrors((prev) => ({ ...prev, [submoduleId]: "Failed to load content." }));
         setLoadingSubmodule((cur) => (cur === submoduleId ? null : cur));
       })
       .finally(() => {
         inflight.current.delete(submoduleId);
       });
   }, []);
+
+  const retrySubmodule = useCallback((moduleId: string, submoduleId: string) => {
+    loaded.current.delete(submoduleId);
+    inflight.current.delete(submoduleId);
+    setSubmoduleErrors((prev) => { const next = { ...prev }; delete next[submoduleId]; return next; });
+    loadSubmodule(moduleId, submoduleId);
+  }, [loadSubmodule]);
 
   const completeSubmodule = useCallback((submoduleId: string) => {
     setProgress((prev) => ({ ...prev, [submoduleId]: true }));
@@ -96,9 +111,11 @@ export function useCourse() {
     error,
     progress,
     submoduleContents,
+    submoduleErrors,
     loadingSubmodule,
     generateCourse,
     loadSubmodule,
+    retrySubmodule,
     completeSubmodule,
     isModuleComplete,
   };

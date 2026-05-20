@@ -18,9 +18,11 @@ export default function CoursePage() {
     error,
     progress,
     submoduleContents,
+    submoduleErrors,
     loadingSubmodule,
     generateCourse,
     loadSubmodule,
+    retrySubmodule,
     completeSubmodule,
     isModuleComplete,
   } = useCourse();
@@ -66,6 +68,7 @@ export default function CoursePage() {
   const activeModule = course?.modules.find((m) => m.id === activeModuleId);
   const activeSubmodule = activeModule?.submodules.find((s) => s.id === activeSubmoduleId);
   const activeContent = activeSubmoduleId ? submoduleContents[activeSubmoduleId] : undefined;
+  const activeError = activeSubmoduleId ? submoduleErrors[activeSubmoduleId] : undefined;
   const isLoadingContent = loadingSubmodule === activeSubmoduleId;
 
   /* ── Landing / input ── */
@@ -338,8 +341,12 @@ export default function CoursePage() {
                 submodule={activeSubmodule}
                 content={activeContent}
                 loading={isLoadingContent}
+                error={activeError}
                 completed={progress[activeSubmoduleId!] ?? false}
                 onComplete={handleComplete}
+                onRetry={activeSubmoduleId && activeModuleId
+                  ? () => retrySubmodule(activeModuleId, activeSubmoduleId)
+                  : undefined}
               />
             ) : (
               <div
