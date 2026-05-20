@@ -1,0 +1,17 @@
+{
+  "name": "skillchain-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js --network base_sepolia",
+    "verify": "hardhat verify --network base_sepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5",
+    "hardhat": "^2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5"
+  }
+}
