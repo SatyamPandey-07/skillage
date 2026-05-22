@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, ChevronDown } from "lucide-react";
 
 const DIFFICULTIES = ["Easy", "Medium", "Hard"] as const;
@@ -26,9 +26,12 @@ export function TopicInput({
   const [difficulty, setDifficulty] = useState<Difficulty>(defaultDifficulty);
   const [numQuestions, setNumQuestions] = useState(defaultNumQuestions);
 
-  const selectBase =
-    "appearance-none pl-3 pr-7 py-1.5 text-sm rounded-[8px] border border-white/10 text-white/70 cursor-pointer focus:outline-none focus:border-indigo-500";
-  const selectStyle = { background: "rgba(20,20,32,0.9)" };
+  // Sync state if defaultTopic changes from suggestions
+  useEffect(() => {
+    if (defaultTopic) {
+      setTopic(defaultTopic);
+    }
+  }, [defaultTopic]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,77 +40,86 @@ export function TopicInput({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
-      <div className="relative flex flex-col md:block">
-        <input
-          type="text"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="What do you want to learn today?"
-          className="se-input text-base md:text-lg px-5 py-4 pr-4 md:pr-64 w-full"
-          disabled={loading}
-          autoFocus
-        />
-        <div className="mt-3 md:mt-0 md:absolute md:right-2 md:top-1/2 md:-translate-y-1/2 flex flex-wrap items-center gap-2 justify-end w-full md:w-auto">
-          {/* Difficulty */}
-          <div className="relative flex-1 md:flex-initial">
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-              className={`${selectBase} w-full`}
-              style={selectStyle}
-              disabled={loading}
-            >
-              {DIFFICULTIES.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={12}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
-            />
+    <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in w-full">
+      <div className="se-card border border-white/10 bg-black/45 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl shadow-2xl transition-all hover:border-cyan-500/25">
+        {/* Input Area */}
+        <div className="w-full">
+          <input
+            type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="What do you want to learn today? (e.g. Zero Knowledge Proofs)"
+            className="w-full bg-transparent border-none outline-none text-white text-base sm:text-lg md:text-xl font-light placeholder-white/20 focus:outline-none focus:ring-0 px-1 py-2 sm:py-3 transition-all"
+            disabled={loading}
+            autoFocus
+          />
+        </div>
+
+        {/* Separator line */}
+        <div className="h-[1px] w-full bg-white/5 my-3" />
+
+        {/* Controls row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {/* Difficulty Pill */}
+            <div className="relative flex-1 sm:flex-initial">
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+                className="w-full sm:w-auto appearance-none bg-black/60 border border-white/10 text-white/80 rounded-full pl-3 pr-8 py-1.5 text-xs font-semibold cursor-pointer hover:bg-black/80 hover:border-cyan-500/30 transition-all focus:outline-none"
+                disabled={loading}
+              >
+                {DIFFICULTIES.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={12}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
+              />
+            </div>
+
+            {/* Questions Pill */}
+            <div className="relative flex-1 sm:flex-initial">
+              <select
+                value={numQuestions}
+                onChange={(e) => setNumQuestions(Number(e.target.value))}
+                className="w-full sm:w-auto appearance-none bg-black/60 border border-white/10 text-white/80 rounded-full pl-3 pr-8 py-1.5 text-xs font-semibold cursor-pointer hover:bg-black/80 hover:border-cyan-500/30 transition-all focus:outline-none"
+                disabled={loading}
+              >
+                {QUESTION_COUNTS.map((n) => (
+                  <option key={n} value={n}>
+                    {n} Qs
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={12}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
+              />
+            </div>
           </div>
 
-          {/* Question count */}
-          <div className="relative flex-1 md:flex-initial">
-            <select
-              value={numQuestions}
-              onChange={(e) => setNumQuestions(Number(e.target.value))}
-              className={`${selectBase} w-full`}
-              style={selectStyle}
-              disabled={loading}
-            >
-              {QUESTION_COUNTS.map((n) => (
-                <option key={n} value={n}>
-                  {n} Qs
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={12}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
-            />
-          </div>
-
-          {/* Submit */}
+          {/* Learn Button */}
           <button
             type="submit"
             disabled={!topic.trim() || loading}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-[8px] text-sm font-semibold text-white transition-all disabled:opacity-40 se-btn-glow-cyan hover:scale-[1.02] w-full md:w-auto justify-center"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-white transition-all duration-300 disabled:opacity-40 disabled:scale-100 hover:scale-[1.03] se-btn-glow-cyan w-full sm:w-auto justify-center cursor-pointer"
             style={{
               background: loading ? "rgba(6, 182, 212, 0.4)" : "linear-gradient(90deg, #06b6d4, #6366f1)",
               border: "none",
             }}
             aria-label="Generate lesson"
           >
-            <Sparkles size={14} className={loading ? "animate-spin" : "animate-pulse"} />
-            {loading ? "Generating…" : "Learn"}
+            <Sparkles size={13} className={loading ? "animate-spin text-cyan-200" : "animate-pulse text-cyan-200"} />
+            <span>{loading ? "Generating..." : "Generate AI Lesson"}</span>
           </button>
         </div>
       </div>
-      <p className="text-xs text-white/35 text-center">
+
+      <p className="text-[10px] tracking-wider text-white/30 text-center font-mono uppercase">
         AI generates a customized interactive lesson + {numQuestions}-question {difficulty.toLowerCase()} MCQ quiz. Score ≥80% to earn your soulbound NFT.
       </p>
     </form>

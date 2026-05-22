@@ -72,6 +72,14 @@ function HomeContent() {
   const prefillDifficulty = (searchParams.get("difficulty") ?? "Easy") as "Easy" | "Medium" | "Hard";
   const prefillNumQ = Number(searchParams.get("numQuestions") ?? 5);
 
+  const [selectedTopic, setSelectedTopic] = useState(prefillTopic);
+
+  useEffect(() => {
+    if (prefillTopic) {
+      setSelectedTopic(prefillTopic);
+    }
+  }, [prefillTopic]);
+
   async function handleTopicSubmit(t: string, d: string, n: number) {
     setTopic(t);
     setDifficulty(d);
@@ -141,6 +149,7 @@ function HomeContent() {
   function startNew() {
     setAppState("home");
     setTopic("");
+    setSelectedTopic("");
     setDifficulty("Easy");
     setNumQuestions(5);
     setGrade(null);
@@ -269,10 +278,32 @@ function HomeContent() {
                   <TopicInput
                     onSubmit={handleTopicSubmit}
                     loading={lessonLoading}
-                    defaultTopic={prefillTopic}
+                    defaultTopic={selectedTopic}
                     defaultDifficulty={prefillDifficulty}
                     defaultNumQuestions={prefillNumQ}
                   />
+                </div>
+
+                {/* Popular suggestions */}
+                <div className="space-y-2.5 pt-2 animate-fade-in animate-delay-150">
+                  <span className="text-[10px] uppercase tracking-widest text-white/30 font-mono font-semibold">Popular Hot Topics:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { label: "Zero Knowledge Proofs 🌌", topic: "Zero Knowledge Proofs" },
+                      { label: "Solidity Smart Contracts 📝", topic: "Solidity Smart Contracts" },
+                      { label: "DeFi Liquidity Pools 💸", topic: "DeFi Liquidity Pools" },
+                      { label: "AI Agents on Web3 🤖", topic: "AI Agents on Web3" },
+                      { label: "Layer 2 Scaling ⚡", topic: "Layer 2 Scaling" },
+                    ].map((item) => (
+                      <button
+                        key={item.topic}
+                        onClick={() => setSelectedTopic(item.topic)}
+                        className="px-3.5 py-1.5 rounded-full text-xs bg-white/[0.03] border border-white/5 text-white/60 hover:text-cyan-400 hover:border-cyan-500/30 hover:bg-cyan-500/[0.02] active:scale-95 transition-all duration-300 cursor-pointer font-medium"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {lessonError && (
