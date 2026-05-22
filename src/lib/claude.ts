@@ -1,17 +1,20 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export const MODEL = "gemini-2.5-flash";
+export const MODEL = "llama-3.1-8b-instant";
 
 export async function generateText(
   systemPrompt: string,
   userMessage: string
 ): Promise<string> {
-  const model = genAI.getGenerativeModel({
+  const completion = await groq.chat.completions.create({
     model: MODEL,
-    systemInstruction: systemPrompt,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userMessage },
+    ],
+    temperature: 0.7,
   });
-  const result = await model.generateContent(userMessage);
-  return result.response.text();
+  return completion.choices[0]?.message?.content ?? "";
 }

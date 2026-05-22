@@ -2,53 +2,48 @@
 
 import { useState } from "react";
 import { Send } from "lucide-react";
+import type { McqQuestion } from "@/src/hooks/useLesson";
 
-interface Question {
-  id: number;
-  question: string;
-}
-
-interface Answer {
+export interface McqAnswer {
   questionId: number;
-  answer: string;
+  selectedIndex: number;
 }
 
 interface QuizFormProps {
-  questions: Question[];
-  onSubmit: (answers: Answer[]) => void;
+  questions: McqQuestion[];
+  onSubmit: (answers: McqAnswer[]) => void;
   loading?: boolean;
 }
 
 export function QuizForm({ questions, onSubmit, loading }: QuizFormProps) {
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [showEmpty, setShowEmpty] = useState(false);
+  const [selected, setSelected] = useState<Record<number, number>>({});
+  const [showUnanswered, setShowUnanswered] = useState(false);
 
-  const answeredCount = Object.values(answers).filter((a) => a.trim()).length;
-
-  function setAnswer(id: number, value: string) {
-    setAnswers((prev) => ({ ...prev, [id]: value }));
-  }
+  const answeredCount = Object.keys(selected).length;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const unanswered = questions.some((q) => !answers[q.id]?.trim());
-    if (unanswered) {
-      setShowEmpty(true);
+    const hasUnanswered = questions.some((q) => selected[q.id] === undefined);
+    if (hasUnanswered) {
+      setShowUnanswered(true);
       return;
     }
-    onSubmit(
-      questions.map((q) => ({ questionId: q.id, answer: answers[q.id] ?? "" }))
-    );
+    onSubmit(questions.map((q) => ({ questionId: q.id, selectedIndex: selected[q.id] })));
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pb-24">
       {questions.map((q, i) => {
-        const isEmpty = showEmpty && !answers[q.id]?.trim();
+        const isUnanswered = showUnanswered && selected[q.id] === undefined;
+
         return (
-          <div key={q.id} className="se-card p-5">
-            {/* Question chip + text */}
-            <div className="flex items-start gap-3 mb-3">
+          <div
+            key={q.id}
+            className="se-card p-5"
+            style={isUnanswered ? { borderColor: "rgba(239,68,68,0.4)" } : {}}
+          >
+            {/* Question header */}
+            <div className="flex items-start gap-3 mb-4">
               <span
                 className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-xs font-semibold"
                 style={{
@@ -57,31 +52,54 @@ export function QuizForm({ questions, onSubmit, loading }: QuizFormProps) {
                   color: "#818cf8",
                 }}
               >
-                Q{q.id}
+                {i + 1}
               </span>
-              <p className="text-sm font-medium text-white/80 leading-relaxed pt-0.5">
+              <p className="text-sm font-medium text-white/85 leading-relaxed pt-0.5">
                 {q.question}
               </p>
             </div>
 
-            {/* Textarea */}
-            <div className="relative">
-              <textarea
-                value={answers[q.id] ?? ""}
-                onChange={(e) => setAnswer(q.id, e.target.value)}
-                placeholder="Answer in your own words…"
-                className={`se-input px-4 py-3 text-sm min-h-[100px] resize-y ${
-                  isEmpty ? "border-red-500/50 focus:border-red-500" : ""
-                }`}
-                disabled={loading}
-                aria-label={`Answer to question ${q.id}`}
-              />
-              <span className="absolute bottom-2 right-3 text-[10px] text-white/25">
-                {(answers[q.id] ?? "").length} chars
-              </span>
+            {/* Options */}
+            <div className="space-y-2">
+              {q.options.map((opt, idx) => {
+                const isSelected = selected[q.id] === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() =>
+                      !loading && setSelected((prev) => ({ ...prev, [q.id]: idx }))
+                    }
+                    disabled={loading}
+                    className="w-full text-left px-4 py-3 rounded-[8px] text-sm transition-all flex items-center gap-3"
+                    style={{
+                      border: `1px solid ${
+                        isSelected ? "rgba(99,102,241,0.5)" : "rgba(255,255,255,0.08)"
+                      }`,
+                      background: isSelected ? "rgba(99,102,241,0.08)" : "transparent",
+                      color: isSelected ? "#a5b4fc" : "rgba(255,255,255,0.65)",
+                      cursor: loading ? "default" : "pointer",
+                    }}
+                  >
+                    <span
+                      className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold"
+                      style={{
+                        background: isSelected
+                          ? "rgba(99,102,241,0.2)"
+                          : "rgba(255,255,255,0.06)",
+                        color: isSelected ? "#a5b4fc" : "rgba(255,255,255,0.3)",
+                      }}
+                    >
+                      {["A", "B", "C", "D"][idx]}
+                    </span>
+                    <span className="flex-1">{opt}</span>
+                  </button>
+                );
+              })}
             </div>
-            {isEmpty && (
-              <p className="mt-1 text-xs text-red-400">Please answer this question.</p>
+
+            {isUnanswered && (
+              <p className="mt-2 text-xs text-red-400">Please select an answer.</p>
             )}
           </div>
         );
@@ -99,10 +117,12 @@ export function QuizForm({ questions, onSubmit, loading }: QuizFormProps) {
           type="submit"
           disabled={loading}
           className="flex items-center gap-2 px-6 py-2.5 rounded-[8px] text-sm font-semibold text-white transition-all disabled:opacity-50"
-          style={{ background: loading ? "rgba(99,102,241,0.5)" : "rgb(99,102,241)" }}
+          style={{
+            background: loading ? "rgba(99,102,241,0.5)" : "rgb(99,102,241)",
+          }}
         >
           <Send size={14} />
-          {loading ? "Claude is grading…" : "Submit Answers"}
+          {loading ? "Saving…" : "Submit Quiz"}
         </button>
       </div>
     </form>

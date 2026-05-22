@@ -2,12 +2,22 @@
 
 import { useState } from "react";
 
+export interface McqQuestion {
+  id: number;
+  question: string;
+  options: [string, string, string, string];
+  correctIndex: number;
+}
+
 export interface LessonData {
   title: string;
   summary: string;
   keyPoints: string[];
   funFact: string;
-  questions: { id: number; question: string }[];
+  questions: McqQuestion[];
+  topic?: string;
+  difficulty?: string;
+  numQuestions?: number;
 }
 
 export function useLesson() {
@@ -15,14 +25,14 @@ export function useLesson() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function generateLesson(topic: string, difficulty: string) {
+  async function generateLesson(topic: string, difficulty: string, numQuestions = 5) {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/lesson", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, difficulty }),
+        body: JSON.stringify({ topic, difficulty, numQuestions }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to generate lesson");
@@ -34,7 +44,7 @@ export function useLesson() {
     }
   }
 
-  async function retryQuestions(topic: string, difficulty: string) {
+  async function retryQuestions(topic: string, difficulty: string, numQuestions = 5) {
     if (!lesson) return;
     setLoading(true);
     setError(null);
@@ -42,7 +52,7 @@ export function useLesson() {
       const res = await fetch("/api/retry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, difficulty }),
+        body: JSON.stringify({ topic, difficulty, numQuestions }),
       });
       const questions = await res.json();
       if (!res.ok) throw new Error(questions.error ?? "Failed to generate questions");
