@@ -20,6 +20,7 @@ import {
   XCircle,
   Trophy,
   Percent,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { shortenAddress } from "@/src/utils/shortenAddress";
@@ -149,6 +150,17 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-10 w-full animate-fade-in">
+        {/* Back Link */}
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-white/40 hover:text-cyan-400 transition-colors duration-300 group"
+          >
+            <ArrowLeft size={14} className="transform transition-transform group-hover:-translate-x-1" />
+            Back to Hub
+          </Link>
+        </div>
+
         {/* Welcome Section */}
         {user ? (
           <div className="mb-10 space-y-4">
