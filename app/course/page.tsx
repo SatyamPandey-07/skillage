@@ -7,6 +7,8 @@ import { CourseOutline } from "@/src/components/course/CourseOutline";
 import { SubmoduleViewer } from "@/src/components/course/SubmoduleViewer";
 import { ErrorBanner } from "@/src/components/ui/ErrorBanner";
 import { useCourse } from "@/src/hooks/useCourse";
+import { usePrivy } from "@privy-io/react-auth";
+import { WalletHeader } from "@/src/components/ui/WalletHeader";
 
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"] as const;
 type Difficulty = (typeof DIFFICULTIES)[number];
@@ -26,6 +28,8 @@ export default function CoursePage() {
     completeSubmodule,
     isModuleComplete,
   } = useCourse();
+
+  const { authenticated, login } = usePrivy();
 
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("Beginner");
@@ -74,38 +78,52 @@ export default function CoursePage() {
   /* ── Landing / input ── */
   if (!course && !generating) {
     return (
-      <div className="min-h-screen se-grid relative" style={{ background: "#0a0a0f" }}>
+      <div className="min-h-screen se-grid relative pt-14 overflow-hidden" style={{ background: "var(--bg)" }}>
         <div
           className="pointer-events-none absolute inset-0 se-hero-bg"
-          style={{ opacity: 0.6 }}
+          style={{ opacity: 0.7 }}
         />
         <header
-          className="sticky top-0 z-40 flex items-center justify-between px-4 h-14 border-b"
+          className="fixed top-0 left-0 right-0 w-full z-40 flex items-center justify-between px-4 h-14 border-b"
           style={{
-            background: "rgba(12,12,18,0.9)",
+            background: "rgba(5, 5, 8, 0.8)",
             backdropFilter: "blur(16px)",
-            borderColor: "rgba(255,255,255,0.08)",
+            borderColor: "rgba(255, 255, 255, 0.05)",
           }}
         >
           <div className="flex items-center gap-2">
-            <GraduationCap size={20} className="text-indigo-400" />
+            <GraduationCap size={20} className="text-cyan-400 animate-pulse" />
             <span className="font-semibold text-white tracking-tight">SkillChain</span>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="text-xs transition-colors"
-              style={{ color: "rgba(255,255,255,0.4)" }}
+              className="text-xs transition-colors text-white/40 hover:text-cyan-400"
             >
               Quick Lesson
             </Link>
             <Link
               href="/dashboard"
-              className="text-xs transition-colors"
-              style={{ color: "rgba(255,255,255,0.4)" }}
+              className="text-xs transition-colors text-white/40 hover:text-cyan-400"
             >
               Dashboard
             </Link>
+            {/* Privy wallet */}
+            {authenticated ? (
+              <WalletHeader />
+            ) : (
+              <button
+                onClick={login}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-all duration-300 border hover:scale-105"
+                style={{
+                  background: "rgba(6, 182, 212, 0.08)",
+                  border: "1px solid rgba(6, 182, 212, 0.25)",
+                  color: "#22d3ee",
+                }}
+              >
+                Connect Wallet
+              </button>
+            )}
           </div>
         </header>
 
@@ -116,17 +134,17 @@ export default function CoursePage() {
               <div
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
                 style={{
-                  background: "rgba(99,102,241,0.1)",
-                  border: "1px solid rgba(99,102,241,0.2)",
-                  color: "#a5b4fc",
+                  background: "rgba(6, 182, 212, 0.08)",
+                  border: "1px solid rgba(6, 182, 212, 0.2)",
+                  color: "#a5f3fc",
                 }}
               >
-                <BookOpen size={12} />
+                <BookOpen size={12} className="text-cyan-400 animate-pulse" />
                 Structured Course Mode
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
                 Learn deeply.{" "}
-                <span style={{ color: "#818cf8" }}>Step by step.</span>
+                <span className="se-glow-text-brand">Step by step.</span>
               </h1>
               <p className="text-lg max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.5)" }}>
                 AI generates a full multi-module course — reading content, code examples, resources, and quizzes.
@@ -242,29 +260,28 @@ export default function CoursePage() {
 
   /* ── Course viewer ── */
   return (
-    <div className="h-screen flex flex-col" style={{ background: "#0a0a0f" }}>
+    <div className="h-screen flex flex-col pt-14" style={{ background: "var(--bg)" }}>
       {/* Nav */}
       <header
-        className="shrink-0 z-40 flex items-center justify-between px-4 h-14 border-b"
+        className="fixed top-0 left-0 right-0 w-full z-40 flex items-center justify-between px-4 h-14 border-b"
         style={{
-          background: "rgba(12,12,18,0.95)",
+          background: "rgba(5, 5, 8, 0.85)",
           backdropFilter: "blur(16px)",
-          borderColor: "rgba(255,255,255,0.08)",
+          borderColor: "rgba(255, 255, 255, 0.05)",
         }}
       >
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => setSidebarOpen((o) => !o)}
-            className="shrink-0 p-1.5 rounded-[6px] transition-all"
+            className="shrink-0 p-1.5 rounded-[6px] transition-all hover:text-cyan-400"
             style={{ color: "rgba(255,255,255,0.45)" }}
             aria-label="Toggle sidebar"
           >
             {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <GraduationCap size={17} className="shrink-0 text-indigo-400" />
+          <GraduationCap size={17} className="shrink-0 text-cyan-400 animate-pulse" />
           <span
-            className="font-semibold tracking-tight text-sm truncate"
-            style={{ color: "rgba(255,255,255,0.9)" }}
+            className="font-semibold tracking-tight text-sm truncate text-white"
           >
             {course.title}
           </span>
@@ -272,15 +289,13 @@ export default function CoursePage() {
         <div className="flex items-center gap-4 shrink-0">
           <Link
             href="/"
-            className="text-xs transition-colors"
-            style={{ color: "rgba(255,255,255,0.35)" }}
+            className="text-xs transition-colors text-white/40 hover:text-cyan-400"
           >
             Quick Lesson
           </Link>
           <Link
             href="/dashboard"
-            className="text-xs transition-colors"
-            style={{ color: "rgba(255,255,255,0.35)" }}
+            className="text-xs transition-colors text-white/40 hover:text-cyan-400"
           >
             Dashboard
           </Link>
@@ -290,11 +305,26 @@ export default function CoursePage() {
               setActiveSubmoduleId(null);
               generateCourse(course.topic, course.difficulty);
             }}
-            className="text-xs transition-colors"
-            style={{ color: "rgba(255,255,255,0.35)" }}
+            className="text-xs transition-colors text-white/40 hover:text-cyan-400"
           >
             New Course
           </button>
+          {/* Privy wallet */}
+          {authenticated ? (
+            <WalletHeader />
+          ) : (
+            <button
+              onClick={login}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-all duration-300 border hover:scale-105"
+              style={{
+                background: "rgba(6, 182, 212, 0.08)",
+                border: "1px solid rgba(6, 182, 212, 0.25)",
+                color: "#22d3ee",
+              }}
+            >
+              Connect Wallet
+            </button>
+          )}
         </div>
       </header>
 

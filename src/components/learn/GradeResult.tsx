@@ -100,11 +100,14 @@ export function GradeResult({ grade, onMint, onRetry }: GradeResultProps) {
       {grade.passed ? (
         <button
           onClick={onMint}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-[8px] text-sm font-semibold text-white transition-all"
-          style={{ background: "rgb(99,102,241)" }}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-[8px] text-sm font-semibold text-white transition-all se-btn-glow-cyan hover:scale-[1.01]"
+          style={{
+            background: "linear-gradient(90deg, #06b6d4, #6366f1)",
+            border: "none",
+          }}
         >
           <Award size={16} />
-          Mint your certificate
+          Mint your Soulbound Certificate
         </button>
       ) : (
         <div className="space-y-2">
