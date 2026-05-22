@@ -1,4 +1,4 @@
-# ⚡ SkillChain (Skillage) 
+# ⚡ Skillage
 
 > **Next-Gen Onchain Credentials Powered by AI evaluations and Gasless Soulbound NFTs.**
 
@@ -6,11 +6,11 @@
 
 ## 🌌 Introduction
 
-SkillChain is a decentralized micro-learning dApp deployed on **Base Sepolia**. It empowers developers and students to learn anything under the sun, evaluate their knowledge with customized AI evaluations, and cryptographically prove their mastery onchain using official gasless **Soulbound NFT certificates**—with zero gas fees or native ETH required.
+Skillage is a decentralized micro-learning dApp deployed on **Base Sepolia**. It empowers developers and students to learn anything under the sun, evaluate their knowledge with customized AI evaluations, and cryptographically prove their mastery onchain using official gasless **Soulbound NFT certificates**—with zero gas fees or native ETH required.
 
 ```
 +-----------------------------------------------------------------+
-|                         SKILLCHAIN HUB                          |
+|                           SKILLAGE HUB                          |
 |                                                                 |
 |  [ Topic Search ] ---> [ AI Synthesized ] ---> [ MCQ Quiz ]     |
 |                             Curriculum           (≥ 80% score)  |
@@ -25,7 +25,7 @@ SkillChain is a decentralized micro-learning dApp deployed on **Base Sepolia**. 
 
 ## 🎨 Premium Cybersecurity Aesthetics
 
-SkillChain is styled under a dark obsidian-glass cyberpunk theme inspired by modern premium award-winning developer portfolios:
+Skillage is styled under a dark obsidian-glass cyberpunk theme inspired by modern premium award-winning developer portfolios:
 - **Cosmic Color System**: Multi-layered background grids, cosmic-radial glows (`#020204`), and high-tech cyber-cyan (`#06b6d4`) / bright violet (`#d946ef`) accents.
 - **HUD HUD Glass Cards**: Glassmorphic dashboards (`backdrop-filter`) with glowing border gradients and micro-animated lifting effects.
 - **Holographic Scanners**: Immersive empty-state panels with responsive custom inline keyframe laser scanners that sweep across verified portals.
@@ -123,7 +123,7 @@ NEXT_PUBLIC_CHAIN_ID=84532
    pnpm dev
    ```
 
-3. **Visit the SkillChain hub in your browser**:
+3. **Visit the Skillage hub in your browser**:
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 4. **Verify codebase formatting and static types**:

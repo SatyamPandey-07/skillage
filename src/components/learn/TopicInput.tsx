@@ -13,6 +13,7 @@ interface TopicInputProps {
   defaultTopic?: string;
   defaultDifficulty?: Difficulty;
   defaultNumQuestions?: number;
+  hideSubmit?: boolean;
 }
 
 export function TopicInput({
@@ -21,6 +22,7 @@ export function TopicInput({
   defaultTopic = "",
   defaultDifficulty = "Easy",
   defaultNumQuestions = 5,
+  hideSubmit = false,
 }: TopicInputProps) {
   const [topic, setTopic] = useState(defaultTopic);
   const [difficulty, setDifficulty] = useState<Difficulty>(defaultDifficulty);
@@ -48,7 +50,7 @@ export function TopicInput({
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            placeholder="What do you want to learn today? (e.g. Zero Knowledge Proofs)"
+            placeholder={hideSubmit ? "What do you want to learn today? (Type & press Enter ↵)" : "What do you want to learn today? (e.g. Zero Knowledge Proofs)"}
             className="w-full bg-transparent border-none outline-none text-white text-base sm:text-lg md:text-xl font-light placeholder-white/20 focus:outline-none focus:ring-0 px-1 py-2 sm:py-3 transition-all"
             disabled={loading}
             autoFocus
@@ -102,20 +104,25 @@ export function TopicInput({
             </div>
           </div>
 
-          {/* Learn Button */}
-          <button
-            type="submit"
-            disabled={!topic.trim() || loading}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-white transition-all duration-300 disabled:opacity-40 disabled:scale-100 hover:scale-[1.03] se-btn-glow-cyan w-full sm:w-auto justify-center cursor-pointer"
-            style={{
-              background: loading ? "rgba(6, 182, 212, 0.4)" : "linear-gradient(90deg, #06b6d4, #6366f1)",
-              border: "none",
-            }}
-            aria-label="Generate lesson"
-          >
-            <Sparkles size={13} className={loading ? "animate-spin text-cyan-200" : "animate-pulse text-cyan-200"} />
-            <span>{loading ? "Generating..." : "Generate AI Lesson"}</span>
-          </button>
+          {/* Learn Button (Hidden when hideSubmit is true) */}
+          {!hideSubmit ? (
+            <button
+              type="submit"
+              disabled={!topic.trim() || loading}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-white transition-all duration-300 disabled:opacity-40 disabled:scale-100 hover:scale-[1.03] se-btn-glow-cyan w-full sm:w-auto justify-center cursor-pointer"
+              style={{
+                background: loading ? "rgba(6, 182, 212, 0.4)" : "linear-gradient(90deg, #06b6d4, #6366f1)",
+                border: "none",
+              }}
+              aria-label="Generate lesson"
+            >
+              <Sparkles size={13} className={loading ? "animate-spin text-cyan-200" : "animate-pulse text-cyan-200"} />
+              <span>{loading ? "Generating..." : "Generate AI Lesson"}</span>
+            </button>
+          ) : (
+            /* Invisible submit button to ensure standard HTML Enter key form submission is triggered in all browsers */
+            <button type="submit" className="hidden" />
+          )}
         </div>
       </div>
 

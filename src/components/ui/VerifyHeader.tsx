@@ -4,9 +4,11 @@ import { usePrivy } from "@privy-io/react-auth";
 import { WalletHeader } from "@/src/components/ui/WalletHeader";
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/src/context/AuthContext";
 
 export function VerifyHeader() {
   const { authenticated, login } = usePrivy();
+  const { user } = useAuth();
 
   return (
     <header
@@ -19,7 +21,7 @@ export function VerifyHeader() {
     >
       <Link href="/" className="flex items-center gap-2">
         <GraduationCap size={20} className="text-cyan-400 animate-pulse" />
-        <span className="font-semibold text-white tracking-tight">SkillChain</span>
+        <span className="font-semibold text-white tracking-tight">Skillage</span>
       </Link>
       
       <div className="flex items-center gap-4">
@@ -29,12 +31,14 @@ export function VerifyHeader() {
         >
           Quick Lesson
         </Link>
-        <Link
-          href="/dashboard"
-          className="text-xs transition-colors text-white/40 hover:text-cyan-400"
-        >
-          Dashboard
-        </Link>
+        {(user || authenticated) && (
+          <Link
+            href="/dashboard"
+            className="text-xs transition-colors text-white/40 hover:text-cyan-400"
+          >
+            Dashboard
+          </Link>
+        )}
         
         {/* Privy wallet */}
         {authenticated ? (

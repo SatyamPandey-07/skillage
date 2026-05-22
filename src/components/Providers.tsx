@@ -13,7 +13,8 @@ const BASE_SEPOLIA = {
 };
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "";
+  // Provide the default app ID as a robust production fallback to prevent crashing if the env var is missing or unloaded
+  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || "cmpee4fmo005n0clbs8xouegq";
 
   const inner =
     privyAppId && privyAppId !== "clxxxxxxxxxxxxxx" ? (

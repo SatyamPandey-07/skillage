@@ -11,7 +11,7 @@ declare module "iron-session" {
 
 const SESSION_OPTIONS = {
   password: process.env.SESSION_SECRET as string,
-  cookieName: "skillchain-session",
+  cookieName: "skillage-session",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,

@@ -177,7 +177,7 @@ function HomeContent() {
       >
         <div className="flex items-center gap-2">
           <GraduationCap size={20} className="text-cyan-400 animate-pulse" />
-          <span className="font-semibold text-white tracking-tight">SkillChain</span>
+          <span className="font-semibold text-white tracking-tight">Skillage</span>
         </div>
 
         {appState !== "home" && (
@@ -185,12 +185,16 @@ function HomeContent() {
         )}
 
         <div className="flex items-center gap-3">
-          <Link href="/course" className="text-xs text-white/40 hover:text-cyan-400 transition-colors">
-            Courses
-          </Link>
-          <Link href="/dashboard" className="text-xs text-white/40 hover:text-cyan-400 transition-colors">
-            Dashboard
-          </Link>
+          {(user || authenticated) && (
+            <>
+              <Link href="/course" className="text-xs text-white/40 hover:text-cyan-400 transition-colors">
+                Courses
+              </Link>
+              <Link href="/dashboard" className="text-xs text-white/40 hover:text-cyan-400 transition-colors">
+                Dashboard
+              </Link>
+            </>
+          )}
 
           {/* Supabase Google auth */}
           {user ? (
@@ -274,37 +278,77 @@ function HomeContent() {
                   </p>
                 </div>
                 
-                <div className="pt-2">
-                  <TopicInput
-                    onSubmit={handleTopicSubmit}
-                    loading={lessonLoading}
-                    defaultTopic={selectedTopic}
-                    defaultDifficulty={prefillDifficulty}
-                    defaultNumQuestions={prefillNumQ}
-                  />
-                </div>
+                {user || authenticated ? (
+                  <>
+                    <div className="pt-2">
+                      <TopicInput
+                        onSubmit={handleTopicSubmit}
+                        loading={lessonLoading}
+                        defaultTopic={selectedTopic}
+                        defaultDifficulty={prefillDifficulty}
+                        defaultNumQuestions={prefillNumQ}
+                        hideSubmit={true}
+                      />
+                    </div>
 
-                {/* Popular suggestions */}
-                <div className="space-y-2.5 pt-2 animate-fade-in animate-delay-150">
-                  <span className="text-[10px] uppercase tracking-widest text-white/30 font-mono font-semibold">Popular Hot Topics:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { label: "Zero Knowledge Proofs 🌌", topic: "Zero Knowledge Proofs" },
-                      { label: "Solidity Smart Contracts 📝", topic: "Solidity Smart Contracts" },
-                      { label: "DeFi Liquidity Pools 💸", topic: "DeFi Liquidity Pools" },
-                      { label: "AI Agents on Web3 🤖", topic: "AI Agents on Web3" },
-                      { label: "Layer 2 Scaling ⚡", topic: "Layer 2 Scaling" },
-                    ].map((item) => (
+                    {/* Popular suggestions */}
+                    <div className="space-y-2.5 pt-2 animate-fade-in animate-delay-150">
+                      <span className="text-[10px] uppercase tracking-widest text-white/30 font-mono font-semibold">Popular Hot Topics:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { label: "Zero Knowledge Proofs 🌌", topic: "Zero Knowledge Proofs" },
+                          { label: "Solidity Smart Contracts 📝", topic: "Solidity Smart Contracts" },
+                          { label: "DeFi Liquidity Pools 💸", topic: "DeFi Liquidity Pools" },
+                          { label: "AI Agents on Web3 🤖", topic: "AI Agents on Web3" },
+                          { label: "Layer 2 Scaling ⚡", topic: "Layer 2 Scaling" },
+                        ].map((item) => (
+                          <button
+                            key={item.topic}
+                            onClick={() => handleTopicSubmit(item.topic, difficulty, numQuestions)}
+                            className="px-3.5 py-1.5 rounded-full text-xs bg-white/[0.03] border border-white/5 text-white/60 hover:text-cyan-400 hover:border-cyan-500/30 hover:bg-cyan-500/[0.02] active:scale-95 transition-all duration-300 cursor-pointer font-medium"
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* Premium Authentication Gate Panel */
+                  <div className="se-card border border-white/10 bg-black/45 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl space-y-5 animate-fade-in">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                        <Sparkles size={16} className="text-cyan-400 animate-pulse" />
+                      </div>
+                      <span className="se-label font-semibold">Access Key Terminal</span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-white tracking-tight">
+                        Unlock your AI learning terminal.
+                      </h3>
+                      <p className="text-sm text-white/50 leading-relaxed">
+                        Please sign in with Google or connect your wallet below to instantly generate customized interactive lessons, test your skills, and mint gasless soulbound certificates on Base Sepolia.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 pt-1">
                       <button
-                        key={item.topic}
-                        onClick={() => setSelectedTopic(item.topic)}
-                        className="px-3.5 py-1.5 rounded-full text-xs bg-white/[0.03] border border-white/5 text-white/60 hover:text-cyan-400 hover:border-cyan-500/30 hover:bg-cyan-500/[0.02] active:scale-95 transition-all duration-300 cursor-pointer font-medium"
+                        onClick={signInWithGoogle}
+                        className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer shadow-lg shadow-indigo-600/10"
                       >
-                        {item.label}
+                        <LogIn size={15} />
+                        Sign in with Google
                       </button>
-                    ))}
+                      <button
+                        onClick={login}
+                        className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-full text-sm font-semibold text-cyan-200 border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 hover:border-cyan-500/40 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer shadow-lg shadow-cyan-500/5"
+                      >
+                        Connect Web3 Wallet
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {lessonError && (
                   <ErrorBanner

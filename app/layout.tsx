@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillChain — Learn anything. Prove it onchain.",
+  title: "Skillage — Learn anything. Prove it onchain.",
   description:
     "AI-generated lessons, Claude-graded quizzes, and soulbound NFT certificates on Base Sepolia. Gasless via UGF.",
 };

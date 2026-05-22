@@ -106,7 +106,7 @@ export default function Dashboard() {
       >
         <Link href="/" className="flex items-center gap-2">
           <GraduationCap size={20} className="text-cyan-400 animate-pulse" />
-          <span className="font-semibold text-white tracking-tight">SkillChain</span>
+          <span className="font-semibold text-white tracking-tight">Skillage</span>
         </Link>
         <div className="flex items-center gap-3">
           {user ? (

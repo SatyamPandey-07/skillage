@@ -9,6 +9,7 @@ import { ErrorBanner } from "@/src/components/ui/ErrorBanner";
 import { useCourse } from "@/src/hooks/useCourse";
 import { usePrivy } from "@privy-io/react-auth";
 import { WalletHeader } from "@/src/components/ui/WalletHeader";
+import { useAuth } from "@/src/context/AuthContext";
 
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"] as const;
 type Difficulty = (typeof DIFFICULTIES)[number];
@@ -30,6 +31,7 @@ export default function CoursePage() {
   } = useCourse();
 
   const { authenticated, login } = usePrivy();
+  const { user } = useAuth();
 
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("Beginner");
@@ -93,7 +95,7 @@ export default function CoursePage() {
         >
           <div className="flex items-center gap-2">
             <GraduationCap size={20} className="text-cyan-400 animate-pulse" />
-            <span className="font-semibold text-white tracking-tight">SkillChain</span>
+            <span className="font-semibold text-white tracking-tight">Skillage</span>
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -102,12 +104,14 @@ export default function CoursePage() {
             >
               Quick Lesson
             </Link>
-            <Link
-              href="/dashboard"
-              className="text-xs transition-colors text-white/40 hover:text-cyan-400"
-            >
-              Dashboard
-            </Link>
+            {(user || authenticated) && (
+              <Link
+                href="/dashboard"
+                className="text-xs transition-colors text-white/40 hover:text-cyan-400"
+              >
+                Dashboard
+              </Link>
+            )}
             {/* Privy wallet */}
             {authenticated ? (
               <WalletHeader />
@@ -293,12 +297,14 @@ export default function CoursePage() {
           >
             Quick Lesson
           </Link>
-          <Link
-            href="/dashboard"
-            className="text-xs transition-colors text-white/40 hover:text-cyan-400"
-          >
-            Dashboard
-          </Link>
+          {(user || authenticated) && (
+            <Link
+              href="/dashboard"
+              className="text-xs transition-colors text-white/40 hover:text-cyan-400"
+            >
+              Dashboard
+            </Link>
+          )}
           <button
             onClick={() => {
               setActiveModuleId(null);
