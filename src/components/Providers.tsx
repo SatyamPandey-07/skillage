@@ -2,6 +2,7 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { UGFProvider } from "@tychilabs/react-ugf";
+import { AuthProvider } from "@/src/context/AuthContext";
 
 const BASE_SEPOLIA = {
   id: 84532,
@@ -14,25 +15,22 @@ const BASE_SEPOLIA = {
 export function Providers({ children }: { children: React.ReactNode }) {
   const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "";
 
-  // Skip Privy init if no app ID — prevents prerender crash
-  if (!privyAppId || privyAppId === "clxxxxxxxxxxxxxx") {
-    return <>{children}</>;
-  }
+  const inner =
+    privyAppId && privyAppId !== "clxxxxxxxxxxxxxx" ? (
+      <PrivyProvider
+        appId={privyAppId}
+        config={{
+          loginMethods: ["email", "wallet"],
+          appearance: { theme: "dark", accentColor: "#6366f1" },
+          defaultChain: BASE_SEPOLIA as any,
+          supportedChains: [BASE_SEPOLIA as any],
+        }}
+      >
+        <UGFProvider>{children}</UGFProvider>
+      </PrivyProvider>
+    ) : (
+      <>{children}</>
+    );
 
-  return (
-    <PrivyProvider
-      appId={privyAppId}
-      config={{
-        loginMethods: ["email", "google", "wallet"],
-        appearance: {
-          theme: "dark",
-          accentColor: "#6366f1",
-        },
-        defaultChain: BASE_SEPOLIA as any,
-        supportedChains: [BASE_SEPOLIA as any],
-      }}
-    >
-      <UGFProvider>{children}</UGFProvider>
-    </PrivyProvider>
-  );
+  return <AuthProvider>{inner}</AuthProvider>;
 }

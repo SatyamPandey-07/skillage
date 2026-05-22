@@ -3,6 +3,7 @@
 **Team:** TEAM SPIRIT · Track: Minting + EdTech · Network: Base Sepolia (Chain ID: 84532)
 
 ---
+hi
 
 ## Table of Contents
 1. [Project Summary](#1-project-summary)
