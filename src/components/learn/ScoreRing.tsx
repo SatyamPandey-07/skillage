@@ -77,15 +77,15 @@ export function ScoreRing({ score, size = 140 }: ScoreRingProps) {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+           transform={`rotate(-90 ${size / 2} ${size / 2})`}
           style={{ transition: "stroke 300ms" }}
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="text-4xl font-bold text-white" style={{ color }}>
+        <span className={`${size < 100 ? "text-sm font-bold" : "text-4xl font-bold"}`} style={{ color }}>
           {score}
         </span>
-        <span className="text-xs text-white/40">/ 100</span>
+        {size >= 100 && <span className="text-xs text-white/40">/ 100</span>}
       </div>
     </div>
   );

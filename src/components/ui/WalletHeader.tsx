@@ -16,12 +16,16 @@ export function WalletHeader() {
   return (
     <div className="flex items-center gap-2">
       <div
-        className="flex items-center gap-2 px-3 py-1.5 rounded-[8px] border border-white/10"
-        style={{ background: "rgba(255,255,255,0.04)" }}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-[8px] border transition-all duration-300"
+        style={{ 
+          background: "rgba(6, 182, 212, 0.06)", 
+          borderColor: "rgba(6, 182, 212, 0.2)",
+          boxShadow: "0 0 15px rgba(6, 182, 212, 0.05)"
+        }}
       >
-        <Wallet size={14} className="text-white/50" />
+        <Wallet size={14} className="text-cyan-400 animate-pulse" />
         <span
-          className="text-sm text-white/60"
+          className="text-xs font-semibold text-cyan-200 tracking-wide"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           {shortenAddress(address)}
@@ -31,16 +35,22 @@ export function WalletHeader() {
         href={`https://sepolia.basescan.org/address/${address}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="p-1.5 rounded-[8px] border border-white/10 text-white/40 hover:text-white/70 transition-colors"
-        style={{ background: "rgba(255,255,255,0.04)" }}
+        className="p-1.5 rounded-[8px] border transition-all duration-300 text-white/40 hover:text-cyan-400 hover:scale-105"
+        style={{ 
+          background: "rgba(255,255,255,0.03)", 
+          borderColor: "rgba(255,255,255,0.06)" 
+        }}
         aria-label="View on BaseScan"
       >
         <ExternalLink size={14} />
       </Link>
       <button
         onClick={logout}
-        className="p-1.5 rounded-[8px] border border-white/10 text-white/40 hover:text-red-400 transition-colors"
-        style={{ background: "rgba(255,255,255,0.04)" }}
+        className="p-1.5 rounded-[8px] border transition-all duration-300 text-white/40 hover:text-red-400 hover:scale-105"
+        style={{ 
+          background: "rgba(255,255,255,0.03)", 
+          borderColor: "rgba(255,255,255,0.06)" 
+        }}
         aria-label="Sign out"
       >
         <LogOut size={14} />

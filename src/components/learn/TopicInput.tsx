@@ -37,24 +37,24 @@ export function TopicInput({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="relative">
+    <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
+      <div className="relative flex flex-col md:block">
         <input
           type="text"
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           placeholder="What do you want to learn today?"
-          className="se-input text-lg px-5 py-4 pr-60"
+          className="se-input text-base md:text-lg px-5 py-4 pr-4 md:pr-64 w-full"
           disabled={loading}
           autoFocus
         />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        <div className="mt-3 md:mt-0 md:absolute md:right-2 md:top-1/2 md:-translate-y-1/2 flex flex-wrap items-center gap-2 justify-end w-full md:w-auto">
           {/* Difficulty */}
-          <div className="relative">
+          <div className="relative flex-1 md:flex-initial">
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-              className={selectBase}
+              className={`${selectBase} w-full`}
               style={selectStyle}
               disabled={loading}
             >
@@ -71,11 +71,11 @@ export function TopicInput({
           </div>
 
           {/* Question count */}
-          <div className="relative">
+          <div className="relative flex-1 md:flex-initial">
             <select
               value={numQuestions}
               onChange={(e) => setNumQuestions(Number(e.target.value))}
-              className={selectBase}
+              className={`${selectBase} w-full`}
               style={selectStyle}
               disabled={loading}
             >
@@ -95,17 +95,20 @@ export function TopicInput({
           <button
             type="submit"
             disabled={!topic.trim() || loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-sm font-semibold text-white transition-all disabled:opacity-40"
-            style={{ background: "rgb(99,102,241)" }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-[8px] text-sm font-semibold text-white transition-all disabled:opacity-40 se-btn-glow-cyan hover:scale-[1.02] w-full md:w-auto justify-center"
+            style={{
+              background: loading ? "rgba(6, 182, 212, 0.4)" : "linear-gradient(90deg, #06b6d4, #6366f1)",
+              border: "none",
+            }}
             aria-label="Generate lesson"
           >
-            <Sparkles size={14} />
+            <Sparkles size={14} className={loading ? "animate-spin" : "animate-pulse"} />
             {loading ? "Generating…" : "Learn"}
           </button>
         </div>
       </div>
       <p className="text-xs text-white/35 text-center">
-        AI generates a lesson + {numQuestions}-question {difficulty.toLowerCase()} MCQ quiz. Score ≥80% to earn a certificate.
+        AI generates a customized interactive lesson + {numQuestions}-question {difficulty.toLowerCase()} MCQ quiz. Score ≥80% to earn your soulbound NFT.
       </p>
     </form>
   );

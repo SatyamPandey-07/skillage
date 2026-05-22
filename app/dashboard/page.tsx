@@ -18,6 +18,8 @@ import {
   RefreshCcw,
   CheckCircle2,
   XCircle,
+  Trophy,
+  Percent,
 } from "lucide-react";
 import Link from "next/link";
 import { shortenAddress } from "@/src/utils/shortenAddress";
@@ -51,7 +53,7 @@ function ScoreBadge({ score, passed }: { score: number; passed: boolean }) {
 }
 
 export default function Dashboard() {
-  const { authenticated } = usePrivy();
+  const { authenticated, login } = usePrivy();
   const { wallets } = useWallets();
   const { user, signInWithGoogle, signOut } = useAuth();
 
@@ -88,14 +90,21 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen se-grid" style={{ background: "#0a0a0f" }}>
+    <div className="min-h-screen se-grid pt-14 relative overflow-hidden" style={{ background: "var(--bg)" }}>
+      {/* Glow overlay */}
+      <div className="pointer-events-none absolute inset-0 se-hero-bg" style={{ opacity: 0.5 }} />
+
       {/* Nav */}
       <header
-        className="sticky top-0 z-40 flex items-center justify-between px-4 h-14 border-b border-white/8"
-        style={{ background: "rgba(12,12,18,0.9)", backdropFilter: "blur(16px)" }}
+        className="fixed top-0 left-0 right-0 w-full z-40 flex items-center justify-between px-4 h-14 border-b transition-all duration-300"
+        style={{ 
+          background: "rgba(5, 5, 8, 0.8)", 
+          backdropFilter: "blur(16px)",
+          borderColor: "rgba(255, 255, 255, 0.05)"
+        }}
       >
         <Link href="/" className="flex items-center gap-2">
-          <GraduationCap size={20} className="text-indigo-400" />
+          <GraduationCap size={20} className="text-cyan-400 animate-pulse" />
           <span className="font-semibold text-white tracking-tight">SkillChain</span>
         </Link>
         <div className="flex items-center gap-3">
@@ -119,35 +128,133 @@ export default function Dashboard() {
               </button>
             </div>
           ) : null}
-          {authenticated && <WalletHeader />}
+          
+          {/* Privy wallet */}
+          {authenticated ? (
+            <WalletHeader />
+          ) : (
+            <button
+              onClick={login}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-all duration-300 border hover:scale-105"
+              style={{
+                background: "rgba(6, 182, 212, 0.08)",
+                border: "1px solid rgba(6, 182, 212, 0.25)",
+                color: "#22d3ee",
+              }}
+            >
+              Connect Wallet
+            </button>
+          )}
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-10 w-full">
+      <main className="max-w-5xl mx-auto px-4 py-10 w-full animate-fade-in">
+        {/* Welcome Section */}
+        {user ? (
+          <div className="mb-10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span className="se-label">Student Space</span>
+                <h1 className="text-3xl font-extrabold text-white tracking-tight mt-1">
+                  Welcome back, <span className="se-glow-text-brand">{user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "Learner"}</span>
+                </h1>
+                <p className="text-white/50 text-sm mt-1">
+                  Track your progress, view your certified modules, and reattempt quizzes.
+                </p>
+              </div>
+              {user.user_metadata?.avatar_url && (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt="Profile Avatar"
+                  className="w-16 h-16 rounded-full border border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.15)] hidden sm:block object-cover"
+                />
+              )}
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              {/* Card 1: Total Attempts */}
+              <div className="se-card p-5 relative overflow-hidden flex flex-col justify-between h-28 group">
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <History size={40} className="text-white" />
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Total Quizzes</span>
+                <span className="text-3xl font-bold text-white tracking-tight">
+                  {attemptsLoading ? "..." : attempts.length}
+                </span>
+                <span className="text-[10px] text-white/50">attempts recorded</span>
+              </div>
+              {/* Card 2: Certificates Earned */}
+              <div className="se-card p-5 relative overflow-hidden flex flex-col justify-between h-28 group" style={{ borderTop: "2px solid rgba(217, 70, 239, 0.4)" }}>
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Award size={40} className="text-violet-400" />
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-violet-400">Minted Certs</span>
+                <span className="text-3xl font-bold text-white tracking-tight se-glow-text-brand">
+                  {certsLoading ? "..." : certs.length}
+                </span>
+                <span className="text-[10px] text-violet-400/70">soulbound NFTs</span>
+              </div>
+              {/* Card 3: Avg Score */}
+              <div className="se-card p-5 relative overflow-hidden flex flex-col justify-between h-28 group" style={{ borderTop: "2px solid rgba(6, 182, 212, 0.4)" }}>
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Trophy size={40} className="text-cyan-400" />
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-cyan-400">Average Score</span>
+                <span className="text-3xl font-bold text-white tracking-tight">
+                  {attemptsLoading ? "..." : attempts.length > 0 ? `${Math.round(attempts.reduce((a, c) => a + c.score, 0) / attempts.length)}%` : "0%"}
+                </span>
+                <span className="text-[10px] text-cyan-400/70">across all tests</span>
+              </div>
+              {/* Card 4: Success Rate */}
+              <div className="se-card p-5 relative overflow-hidden flex flex-col justify-between h-28 group" style={{ borderTop: "2px solid rgba(16, 185, 129, 0.4)" }}>
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <CheckCircle2 size={40} className="text-emerald-400" />
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400">Success Rate</span>
+                <span className="text-3xl font-bold text-white tracking-tight">
+                  {attemptsLoading ? "..." : attempts.length > 0 ? `${Math.round((attempts.filter(a => a.passed).length / attempts.length) * 100)}%` : "0%"}
+                </span>
+                <span className="text-[10px] text-emerald-400/70">score ≥ 80% required</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-10 space-y-4">
+            <span className="se-label">Student Space</span>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight mt-1">
+              Your Onchain <span className="se-glow-text-brand">Academic Hub</span>
+            </h1>
+            <p className="text-white/50 text-sm max-w-xl">
+              Connect your wallet and sign in to track your learning journey, view your earned NFTs, and reattempt generated curriculum modules.
+            </p>
+          </div>
+        )}
+
         {/* Tabs */}
-        <div className="flex items-center gap-1 mb-8 p-1 rounded-[10px] w-fit" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="flex items-center gap-1 mb-8 p-1 rounded-[10px] w-fit" style={{ background: "rgba(5, 5, 8, 0.6)", border: "1px solid rgba(255,255,255,0.05)" }}>
           <button
             onClick={() => setTab("history")}
-            className="flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-medium transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-medium transition-all duration-300"
             style={
               tab === "history"
-                ? { background: "rgba(99,102,241,0.2)", color: "#a5b4fc" }
+                ? { background: "rgba(6, 182, 212, 0.15)", color: "#a5f3fc", boxShadow: "0 0 15px rgba(6, 182, 212, 0.1)" }
                 : { color: "rgba(255,255,255,0.4)" }
             }
           >
-            <History size={14} />
+            <History size={14} className={tab === "history" ? "text-cyan-400 animate-pulse" : ""} />
             Quiz History
           </button>
           <button
             onClick={() => setTab("certs")}
-            className="flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-medium transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-medium transition-all duration-300"
             style={
               tab === "certs"
-                ? { background: "rgba(99,102,241,0.2)", color: "#a5b4fc" }
+                ? { background: "rgba(6, 182, 212, 0.15)", color: "#a5f3fc", boxShadow: "0 0 15px rgba(6, 182, 212, 0.1)" }
                 : { color: "rgba(255,255,255,0.4)" }
             }
           >
-            <Award size={14} />
+            <Award size={14} className={tab === "certs" ? "text-cyan-400 animate-pulse" : ""} />
             Certificates
           </button>
         </div>
